@@ -1,20 +1,20 @@
 # Dockerfile to build docker-compose for aarch64
-FROM arm64v8/python:3.6.5-stretch
+FROM arm64v8/python:3.8.2-buster
 
 # Add env
 ENV LANG C.UTF-8
 
 # Enable cross-build for aarch64
 COPY ./vendor/qemu-bin /usr/bin/
-RUN [ "cross-build-start" ]
+RUN [ resin-xbuild ]
 
 # Set the versions
-ENV DOCKER_COMPOSE_VER 1.22.0
+ENV DOCKER_COMPOSE_VER 1.25.x
 # docker-compose requires pyinstaller 3.3.1 (check github.com/docker/compose/requirements-build.txt)
 # If this changes, you may need to modify the version of "six" below
-ENV PYINSTALLER_VER 3.3.1
+ENV PYINSTALLER_VER 3.6
 # "six" is needed for PyInstaller. v1.11.0 is the latest as of PyInstaller 3.3.1
-ENV SIX_VER 1.11.0
+ENV SIX_VER 1.14.0
 
 # Install dependencies
 # RUN apt-get update && apt-get install -y
@@ -31,6 +31,8 @@ RUN curl -fsSL https://github.com/pyinstaller/pyinstaller/releases/download/v$PY
 WORKDIR /build/dockercompose
 RUN git clone https://github.com/docker/compose.git . \
     && git checkout $DOCKER_COMPOSE_VER
+
+RUN echo 'unknown' > compose/GITSHA
 
 # Run the build steps (taken from github.com/docker/compose/script/build/linux-entrypoint)
 RUN mkdir ./dist \
